@@ -19,17 +19,20 @@ one sig Player {
 }
 
 // chest opening pattern (solution) is linear
+// NOTE: there must be at least on chest in the system for this to be sat
 pred chestsLinear {
   // there exists one chest that doesn't have a next
-  one c: Chest | no c.next 
-  one c: Chest | {
+  one last: Chest | no last.next 
+  one first: Chest | {
     // there exists one chest that doesn't have a previous
-    no next.c 
+    no next.first 
 
     // all chests are reachable from the first chest
-    all other: Chest | other in c.*next
+    all other: Chest | other in first.*next
+
+    // the first chest is the first in the chain
+    Player.firstChest = first
   }
-  { some Player.firstChest } or { no Chest } -- there is a first chest or there are no chests at all
 }
 
 pred init {
@@ -51,19 +54,22 @@ pred opening[c: Chest] {
   c.prereqs in Player.bag -- the prereqs are in the player's bag
 
   // TRANSITION
-  // the next field is set appropriately
-  some prev: Chest | {
-    some next.prev -- exists in the chain of chests that have been opened
-    no prev.next   -- is at the end of the chain of chests that have been opened
+  // if we haven't opened any chests, this is the first chest
+  no Player.firstChest implies {
+    Player.firstChest' = c -- if there isn't a first chest, then the next chest to be opened will be the first one
+    next' = next
+  } else {
+    Player.firstChest' = Player.firstChest
+    some prev: Chest | {
+      { some next.prev } or { prev = Player.firstChest} -- exists in the chain of chests that have been opened 
+      no prev.next   -- is at the end of the chain of chests that have been opened
+   
+      prev.next' = c -- the last thing we opened is now the current chest
 
-    prev.next' = c -- the last thing we opened is now the current chest
-
-    no Player.firstChest implies Player.firstChest' = c -- if there isn't a first chest, then the next chest to be opened will be the first one
-    
-    // all other chests stay the same
-    all other: Chest | {  
-      other != prev
-      other.next' = other.next
+      // all other chests stay the same
+      all other: Chest | {  
+        { other != prev } implies { other.next' = other.next }
+      }
     }
   }
 
@@ -90,12 +96,12 @@ pred traces {
     or 
     { some c: Chest | opening[c] }
   }
+
+  // we eventually find a solution
+  eventually chestsLinear
 }
 
-run {
-  -- we only make valid moves
-  { some c: Chest | opening[c] }
-} //for exactly 5 Chest
+run {traces} for exactly 5 Chest
 
 // test expect {
 //   solutionExists: {
