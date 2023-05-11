@@ -123,7 +123,42 @@ test expect {
 
 // test expects for partial instances
 
-// firstChest antics
-// - firstChest is always the first (induction?)
+
+pred wellformed {
+  // firstChest is actually the first chest in the chain
+  no next.(Player.firstChest)
+
+  all c: next.Chest + Chest.next | c in Player.firstChest.*next
+
+  // there is at most one ending chest (the last opened chest)
+  lone last: Chest | (some next.last) and (no last.next)
+
+  // no cycles
+  all c: Chest | c not in c.^next
+}
+
+pred goodTransition {
+  // contains and prereqs do not change
+  contains = contains'
+  prereqs = prereqs'
+
+  // bag is only addative
+  Player.bag in Player.bag'
+}
 
 // induction: opening cannot put us in a "bad" state
+test expect {
+  base: {
+    init and not wellformed
+  } is unsat
+
+  inductiveStep: {
+    wellformed
+    some c: Chest | opening[c]
+    next_state not wellformed
+  } is unsat
+
+  openingAlwaysGood: {
+    (some c: Chest | opening[c]) implies (goodTransition)
+  } is theorem
+}

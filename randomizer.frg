@@ -60,6 +60,7 @@ pred opening[c: Chest] {
   // GAURD
   // it hasn't been opened yet
   no next.c
+  c != Player.firstChest
 
   // Player has the prereqs
   c.prereqs in Player.bag -- the prereqs are in the player's bag
