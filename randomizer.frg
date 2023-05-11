@@ -42,6 +42,17 @@ pred init {
   
   // Player's bag is empty
   no Player.bag
+
+  // items are unique for chests
+  no disj c1, c2: Chest | {
+    some c1.contains
+    c1.contains = c2.contains
+  }
+
+  // all items exist in a chest
+  all i: Item | {
+    some contains.i
+  }
 }
 
 // what is required for a chest to be opened
@@ -102,27 +113,3 @@ pred traces {
 }
 
 run {traces} for exactly 5 Chest
-
-// test expect {
-//   solutionExists: {
-//     some c1, c2, c3, c4, c5: Chest, sword, shield, key, arrows, bow: Item | {
-//       -- Make sure the chests and items are enumerated
-//       #Chest = 5
-//       #Item = 5
-
-//       -- define chest contents
-//       c1.contains = shield
-//       c2.contains = key
-//       c3.contains = arrows
-//       c4.contains = sword
-//       c5.contains = bow
-
-//       -- define prereqs
-//       c1.prereqs = key + sword
-//       no c2.prereqs
-//       c3.prereqs = key
-//       c4.prereqs = key
-//       c5.prereqs = shield
-//     }
-//   } is sat
-// }
