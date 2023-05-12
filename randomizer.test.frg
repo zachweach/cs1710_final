@@ -80,8 +80,9 @@ test expect {
   } is theorem
 }
 
-// minimal examples, incl the one in our doc
+// test expects for partial instances
 test expect {
+  // this one is a fully complete instance, testing that traces works for a situation that we know to be valid
   designProposal: {
     traces
     some disj c1, c2, c3, c4, c5: Chest, sword, shield, arrows, key, bow: Item | {
@@ -119,10 +120,146 @@ test expect {
       Player.bag''''' = key + arrows + sword + shield + bow
     }
   } for 5 Chest, 5 Item is sat
+
+  worldOneBasic: {
+    traces
+    some disj hill, monster, target, trader, island, gifter: Chest, ladder, boat, sword, bow, emerald: Item | {
+      #Chest = 6
+      #Item = 5
+
+      hill.prereqs = ladder
+      trader.prereqs = emerald
+      no gifter.prereqs
+      island.prereqs = boat
+      target.prereqs = bow
+      monster.prereqs = sword
+    }
+  } for 6 Chest, 5 Item is sat
+
+  worldOnePossible: {
+    traces
+    some disj hill, monster, target, trader, island, gifter: Chest, ladder, boat, sword, bow, emerald: Item | {
+      #Chest = 6
+      #Item = 5
+
+      hill.prereqs = ladder
+      trader.prereqs = emerald
+      no gifter.prereqs
+      island.prereqs = boat
+      target.prereqs = bow
+      monster.prereqs = sword
+
+      hill.contains = bow
+      trader.contains = ladder
+      gifter.contains = emerald
+      no island.contains
+      target.contains = sword
+      monster.contains = boat
+    }
+  } for 6 Chest, 5 Item is sat
+
+  worldOneCannotOpenAny: {
+    traces
+    some disj hill, monster, target, trader, island, gifter: Chest, ladder, boat, sword, bow, emerald: Item | {
+      #Chest = 6
+      #Item = 5
+
+      hill.prereqs = ladder
+      trader.prereqs = emerald
+      no gifter.prereqs
+      island.prereqs = boat
+      target.prereqs = bow
+      monster.prereqs = sword
+
+      hill.contains = bow
+      trader.contains = ladder
+      no gifter.contains
+      island.contains = emerald
+      target.contains = sword
+      monster.contains = boat
+    }
+  } for 6 Chest, 5 Item is unsat
+
+  worldOneChestContainsPrereq: {
+    traces
+    some disj hill, monster, target, trader, island, gifter: Chest, ladder, boat, sword, bow, emerald: Item | {
+      #Chest = 6
+      #Item = 5
+
+      hill.prereqs = ladder
+      trader.prereqs = emerald
+      no gifter.prereqs
+      island.prereqs = boat
+      target.prereqs = bow
+      monster.prereqs = sword
+
+      hill.contains = ladder
+      trader.contains = bow
+      gifter.contains = emerald
+      no island.contains 
+      target.contains = sword
+      monster.contains = boat
+    }
+  } for 6 Chest, 5 Item is unsat
+
+  // the first dungeon from The Legend of Zelda
+  // theEagleVanilla: {
+  //   traces
+  //   some bow, boomerang, triforce, map, compass, keeseKey, stalKey1, stalKey2, stalKey3, goriyaKey, wallKey: Item,
+  //   RM1, RM2, RM3, RM4, RM5, RM6, RM7, RM8, RM9, RM10, RM11: Chest | {
+  //     #Chest = 11
+  //     #Item = 11
+
+  //     no RM1.prereqs
+  //     no RM2.prereqs
+  //     RM3.prereqs = keeseKey 
+  //     RM4.prereqs = keeseKey
+  //     RM5.prereqs = keeseKey + stalKey1
+  //     RM6.prereqs = keeseKey + stalKey1
+  //     RM7.prereqs = keeseKey + stalKey1 + stalKey2
+  //     RM8.prereqs = keeseKey + stalKey1 + stalKey2 + goriyaKey
+  //     RM9.prereqs = keeseKey + stalKey1 + stalKey3
+  //     RM10.prereqs = keeseKey + stalKey1 + stalKey3
+  //     RM11.prereqs = keeseKey + stalKey1 + stalKey3 + wallKey + bow + boomerang
+
+  //     RM1.contains = keeseKey
+  //     RM2.contains = stalKey1
+  //     RM3.contains = stalKey2 
+  //     RM4.contains = compass
+  //     RM5.contains = map
+  //     RM6.contains = stalKey3
+  //     RM7.contains = goriyaKey
+  //     RM8.contains = bow
+  //     RM9.contains = boomerang
+  //     RM10.contains = wallKey
+  //     RM11.contains = triforce
+  //   }
+  // } for 11 Chest, 11 Item is sat
+
+  // theEagleMissingFirstItem: {
+  //   traces
+  //   some disj bow, boomerang, triforce, map, compass, keeseKey, stalKey1, stalKey2, stalKey3, goriyaKey, wallKey: Item,
+  //   RM1, RM2, RM3, RM4, RM5, RM6, RM7, RM8, RM9, RM10, RM11: Chest | {
+  //     #Chest = 11
+  //     #Item = 11
+
+  //     no RM1.prereqs
+  //     no RM2.prereqs
+  //     RM3.prereqs = keeseKey 
+  //     RM4.prereqs = keeseKey
+  //     RM5.prereqs = keeseKey + stalKey1
+  //     RM6.prereqs = keeseKey + stalKey1
+  //     RM7.prereqs = keeseKey + stalKey1 + stalKey2
+  //     RM8.prereqs = keeseKey + stalKey1 + stalKey2 + goriyaKey
+  //     RM9.prereqs = keeseKey + stalKey1 + stalKey2 + goriyaKey + stalKey3
+  //     RM10.prereqs = keeseKey + stalKey1 + stalKey2 + goriyaKey + stalKey3
+  //     RM11.prereqs = keeseKey + stalKey1 + stalKey2 + goriyaKey + stalKey3 + wallKey + bow + boomerang
+
+  //     RM1.contains = triforce
+  //     RM2.contains = compass
+  //   }
+  // } for 11 Chest, 11 Item is unsat
 }
-
-// test expects for partial instances
-
 
 pred wellformed {
   // firstChest is actually the first chest in the chain

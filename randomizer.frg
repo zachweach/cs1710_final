@@ -1,7 +1,7 @@
 #lang forge
 
 option problem_type temporal 
-option max_tracelength 10
+option max_tracelength 15
 
 -- IDEA: option for consumable items (they disappear from bag when used)
 sig Item {}
