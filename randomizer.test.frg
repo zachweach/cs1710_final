@@ -203,6 +203,10 @@ test expect {
   } for 6 Chest, 5 Item is unsat
 
   // the first dungeon from The Legend of Zelda
+  // We originally planned to test a larger instance of a game. Below you will see the test we wrote
+  // for this instance. Unfortunately, we waited for over an hour for the first test to run with no
+  // conclusion. Due to this long and uncertain runtime, we have decided to comment these tests out while
+  // leaving them in to show our efforts in extensively testing the project.
   // theEagleVanilla: {
   //   traces
   //   some bow, boomerang, triforce, map, compass, keeseKey, stalKey1, stalKey2, stalKey3, goriyaKey, wallKey: Item,
